@@ -24,7 +24,7 @@ app.use(
 );
 
 app.use(express.static(path.resolve("public")));
-app.use("/api/assets", assetRoutes);
+app.use("/assets", assetRoutes);
 app.use("/upload", uploadRoutes);
 
 export default app;
