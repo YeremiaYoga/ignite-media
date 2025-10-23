@@ -4,14 +4,19 @@ import path from "path";
 
 const router = express.Router();
 
-const ROOT = path.join(process.cwd(), "public/assets/foundry_vtt");
-const BASE_URL = process.env.PUBLIC_API_URL || "http://localhost:5000";
+const ROOT = path.join(process.cwd(), "public/foundryvtt");
+const BASE_URL = process.env.PUBLIC_API_URL || "http://localhost:5001";
+
 
 router.get("/list", (req, res) => {
   const queryPath = req.query.path || "";
   const targetDir = path.join(ROOT, queryPath);
 
   try {
+    if (!fs.existsSync(targetDir)) {
+      return res.status(404).json({ error: "Directory not found" });
+    }
+
     const entries = fs.readdirSync(targetDir, { withFileTypes: true });
 
     const folders = entries
@@ -27,14 +32,13 @@ router.get("/list", (req, res) => {
       .map((e) => ({
         name: e.name,
         path: path.join(queryPath, e.name).replace(/\\/g, "/"),
-        url: `${BASE_URL}/assets/foundry_vtt/${path
+        url: `${BASE_URL}/foundryvtt/${path
           .join(queryPath, e.name)
           .replace(/\\/g, "/")}`,
       }));
 
-    // Breadcrumbs
     const parts = queryPath.split("/").filter(Boolean);
-    const breadcrumbs = [{ name: "assets", path: "" }];
+    const breadcrumbs = [{ name: "foundryvtt", path: "" }];
     parts.forEach((part, idx) => {
       breadcrumbs.push({
         name: part,
@@ -44,6 +48,7 @@ router.get("/list", (req, res) => {
 
     res.json({ path: queryPath, folders, files, breadcrumbs });
   } catch (err) {
+    console.error("❌ Asset list error:", err);
     res.status(500).json({ error: err.message });
   }
 });
