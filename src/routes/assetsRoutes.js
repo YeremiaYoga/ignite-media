@@ -5,8 +5,7 @@ import path from "path";
 const router = express.Router();
 
 const ROOT = path.join(process.cwd(), "public/foundryvtt");
-const BASE_URL = process.env.PUBLIC_API_URL || "http://localhost:5001";
-
+const BASE_URL = process.env.PUBLIC_API_URL;
 
 router.get("/list", (req, res) => {
   const queryPath = req.query.path || "";
