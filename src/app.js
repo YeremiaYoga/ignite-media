@@ -5,6 +5,9 @@ import path from "path";
 import dotenv from "dotenv";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import assetRoutes from "./routes/assetsRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+
+import { verifyUserFullAuth } from "./middlewares/verifyUserFullAuth.js";
 dotenv.config();
 
 const app = express();
@@ -27,6 +30,7 @@ app.use(
 
 app.use(express.static(path.resolve("public")));
 app.use("/assets", assetRoutes);
+app.use("/profile", verifyUserFullAuth, profileRoutes);
 app.use("/upload", uploadRoutes);
 
 export default app;
