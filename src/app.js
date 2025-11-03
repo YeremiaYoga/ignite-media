@@ -30,7 +30,7 @@ app.use(
 
 app.use(express.static(path.resolve("public")));
 app.use("/assets", assetRoutes);
-app.use("/profile", verifyUserFullAuth, profileRoutes);
+app.use("/profile", profileRoutes);
 app.use("/upload", uploadRoutes);
 
 export default app;
