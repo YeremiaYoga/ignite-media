@@ -6,9 +6,7 @@ import { success, failure } from "../utils/response.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-/**
- * 📤 UPLOAD FILE
- */
+
 export const uploadFile = [
   upload.single("file"),
   async (req, res) => {
@@ -42,10 +40,7 @@ export const uploadFile = [
   },
 ];
 
-/**
- * 🗑️ HAPUS FILE
- * body: { file_path: "assets/icons/icon.png" }
- */
+
 export const deleteFile = async (req, res) => {
   try {
     const { file_path } = req.body || {};
@@ -66,10 +61,7 @@ export const deleteFile = async (req, res) => {
   }
 };
 
-/**
- * 🧹 HAPUS FOLDER DAN ISINYA
- * body: { folder_path: "assets/icons" }
- */
+
 export const deleteFolder = async (req, res) => {
   try {
     const { folder_path } = req.body || {};
@@ -90,10 +82,7 @@ export const deleteFolder = async (req, res) => {
   }
 };
 
-/**
- * 🚚 PINDAHKAN FILE KE FOLDER LAIN
- * body: { from: "assets/icons/old.png", to: "assets/new-icons" }
- */
+
 export const moveFile = async (req, res) => {
   try {
     const { from, to } = req.body || {};
@@ -126,10 +115,7 @@ export const moveFile = async (req, res) => {
   }
 };
 
-/**
- * 📦 PINDAHKAN SELURUH FOLDER KE TEMPAT LAIN
- * body: { from: "assets/icons", to: "assets/archive/icons" }
- */
+
 export const moveFolder = async (req, res) => {
   try {
     const { from, to } = req.body || {};
