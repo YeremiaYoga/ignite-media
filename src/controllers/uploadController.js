@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
 import { success, failure } from "../utils/response.js";
+import sharp from "sharp";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -16,21 +17,43 @@ export const uploadFile = [
       if (!basePath) return failure(res, "Missing path", 400);
       if (!folder_name) return failure(res, "Missing folder_name", 400);
 
-      const safePath = `${basePath}/${folder_name}`.replace(/[^a-zA-Z0-9/_-]/g, "");
+      const safePath = `${basePath}/${folder_name}`.replace(
+        /[^a-zA-Z0-9/_-]/g,
+        ""
+      );
       const dir = path.join("public", safePath);
 
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-      const ext = path.extname(req.file.originalname).toLowerCase();
-      const filename = `${Date.now()}${nanoid(8)}${ext}`;
-      const filePath = path.join(dir, filename);
+      const mime = req.file.mimetype || "";
+      const isImage = mime.startsWith("image/");
 
-      fs.writeFileSync(filePath, req.file.buffer);
+      let filename;
+      let fileBuffer;
+
+      if (isImage) {
+        // 🔹 KHUSUS IMAGE → convert ke WEBP + compress 80
+        filename = `${Date.now()}${nanoid(8)}.webp`;
+
+        fileBuffer = await sharp(req.file.buffer)
+          .webp({ quality: 80 })
+          .toBuffer();
+      } else {
+        // 🔹 BUKAN IMAGE → simpan apa adanya dengan ext asli
+        const ext = path.extname(req.file.originalname).toLowerCase();
+        filename = `${Date.now()}${nanoid(8)}${ext || ""}`;
+        fileBuffer = req.file.buffer;
+      }
+
+      const filePath = path.join(dir, filename);
+      fs.writeFileSync(filePath, fileBuffer);
 
       const url = `/${safePath}/${filename}`;
       const fullUrl = `${req.protocol}://${req.get("host")}${url}`;
 
-      console.log("✅ File uploaded:", fullUrl);
+      console.log(
+        `✅ File uploaded: ${fullUrl} (${isImage ? "image→webp" : "raw file"})`
+      );
       return success(res, { folder: safePath, filename, url, fullUrl });
     } catch (err) {
       console.error("💥 Upload error:", err);
@@ -38,6 +61,7 @@ export const uploadFile = [
     }
   },
 ];
+
 
 export const deleteFile = async (req, res) => {
   try {
