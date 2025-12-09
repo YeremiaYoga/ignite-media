@@ -32,14 +32,14 @@ export const uploadFile = [
       let fileBuffer;
 
       if (isImage) {
-        // 🔹 KHUSUS IMAGE → convert ke WEBP + compress 80
+    
         filename = `${Date.now()}${nanoid(8)}.webp`;
 
         fileBuffer = await sharp(req.file.buffer)
           .webp({ quality: 80 })
           .toBuffer();
       } else {
-        // 🔹 BUKAN IMAGE → simpan apa adanya dengan ext asli
+  
         const ext = path.extname(req.file.originalname).toLowerCase();
         filename = `${Date.now()}${nanoid(8)}${ext || ""}`;
         fileBuffer = req.file.buffer;
