@@ -1,0 +1,55 @@
+import express from "express";
+import fs from "fs";
+import path from "path";
+
+const router = express.Router();
+
+const ROOT = path.join(process.cwd(), "public/calender/season");
+const BASE_URL = process.env.PUBLIC_API_URL;
+
+router.get("/list", (req, res) => {
+  const queryPath = String(req.query.path || "");
+  const targetDir = path.join(ROOT, queryPath);
+
+  try {
+    if (!fs.existsSync(targetDir)) {
+      return res.status(404).json({ error: "Directory not found" });
+    }
+
+    const entries = fs.readdirSync(targetDir, { withFileTypes: true });
+
+    const folders = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => ({
+        name: e.name,
+        path: path.join(queryPath, e.name).replace(/\\/g, "/"),
+      }));
+
+    const files = entries
+      .filter((e) => e.isFile())
+      .filter((e) => /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(e.name))
+      .map((e) => ({
+        name: e.name,
+        path: path.join(queryPath, e.name).replace(/\\/g, "/"),
+        url: `${BASE_URL}/calender/season/${path
+          .join(queryPath, e.name)
+          .replace(/\\/g, "/")}`,
+      }));
+
+    const parts = queryPath.split("/").filter(Boolean);
+    const breadcrumbs = [{ name: "calender/season", path: "" }];
+    parts.forEach((part, idx) => {
+      breadcrumbs.push({
+        name: part,
+        path: parts.slice(0, idx + 1).join("/"),
+      });
+    });
+
+    return res.json({ path: queryPath, folders, files, breadcrumbs });
+  } catch (err) {
+    console.error("❌ Calender season list error:", err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+export default router;
