@@ -25,6 +25,7 @@ app.use(
       process.env.NEXT_PUBLIC_APP_ORIGIN_3,
       process.env.NEXT_PUBLIC_APP_ORIGIN_4,
       process.env.NEXT_PUBLIC_APP_ORIGIN_5,
+      process.env.NEXT_PUBLIC_APP_ORIGIN_6,
     ].filter(Boolean),
     credentials: true,
   })
